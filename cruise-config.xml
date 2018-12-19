@@ -14,7 +14,7 @@
   <pipelines group="my_pipelines">
     <pipeline name="build_test_sonar_and_publish_image">
       <materials>
-        <git url="https://github.com/ysnoussi/sonar-ts-demo.git" branch="test_ci_cd" materialName="test_ci_cd_tut" />
+        <git url="https://github.com/ysnoussi/sonar-ts-demo.git" branch="initial_state" materialName="test_ci_cd_tut" />
       </materials>
       <stage name="Build_Test_Stage">
         <approval type="manual" />
