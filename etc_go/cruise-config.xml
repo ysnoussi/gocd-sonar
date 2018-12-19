@@ -1,0 +1,39 @@
+
+Pipelines
+Templates
+Config XML
+Server Configuration
+User Summary
+Backup
+Package Repositories
+Configuration File /go-w­orkin­g-dir­/conf­ig/cr­uise-­confi­g.xml­Configuration File Path:
+Last modified: less than a minute ago by anonymous
+EDIT
+<?xml version="1.0" encoding="utf-8"?>
+<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="113">
+  <server artifactsdir="artifacts" agentAutoRegisterKey="dc3e8148-3860-4bfb-9f51-5b3bd2dd8f0b" webhookSecret="907513ba-6663-4894-89d9-9928dabe3bf8" commandRepositoryLocation="default" serverId="238a8177-c69f-417e-9862-bbc4d4e9e7b0" tokenGenerationKey="2342cf27-6fd1-4e86-89d6-6908b4afc325">
+    <backup emailOnSuccess="true" emailOnFailure="true" />
+  </server>
+  <pipelines group="my_pipelines">
+    <pipeline name="build_test_sonar_and_publish_image">
+      <materials>
+        <git url="https://github.com/ysnoussi/sonar-ts-demo.git" />
+      </materials>
+      <stage name="defaultStage">
+        <jobs>
+          <job name="defaultJob">
+            <tasks>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>npm install &amp;&amp; npm run build &amp;&amp; npm run test &amp;&amp; npm run cover &amp;&amp; npm run sonar</arg>
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </pipelines>
+  <agents>
+    <agent hostname="77c192dcd95e" ipaddress="192.168.80.4" uuid="eb1f81a6-3ed6-4cc3-9bd9-7ea0e78474ae" />
+  </agents>
+</cruise>

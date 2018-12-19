@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="113">
+  <server artifactsdir="artifacts" agentAutoRegisterKey="dc3e8148-3860-4bfb-9f51-5b3bd2dd8f0b" webhookSecret="907513ba-6663-4894-89d9-9928dabe3bf8" commandRepositoryLocation="default" serverId="238a8177-c69f-417e-9862-bbc4d4e9e7b0" tokenGenerationKey="2342cf27-6fd1-4e86-89d6-6908b4afc325">
+    <backup emailOnSuccess="true" emailOnFailure="true" />
+  </server>
+  <artifactStores>
+    <artifactStore id="dockerhub" pluginId="cd.go.artifact.docker.registry">
+      <property>
+        <key>RegistryURL</key>
+        <value>https://index.docker.io/v1/</value>
+      </property>
+    </artifactStore>
+  </artifactStores>
+  <pipelines group="my_pipelines">
+    <pipeline name="build_test_sonar_and_publish_image">
+      <materials>
+        <git url="https://github.com/ysnoussi/sonar-ts-demo.git" branch="test_ci_cd" materialName="test_ci_cd_tut" />
+      </materials>
+      <stage name="Build_Test_Stage">
+        <approval type="manual" />
+        <jobs>
+          <job name="build_test_scan">
+            <tasks>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>npm install &amp;&amp; npm run build &amp;&amp; npm run test &amp;&amp; npm run cover &amp;&amp; npm run sonar</arg>
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="Quality_audit_stage">
+        <jobs>
+          <job name="sonar_quality_gates_audit">
+            <tasks>
+              <task>
+                <pluginConfiguration id="sonar.quality.gate.plugin" version="1" />
+                <configuration>
+                  <property>
+                    <key>SonarProjectKey</key>
+                    <value>nodejs-key</value>
+                  </property>
+                  <property>
+                    <key>IssueTypeFail</key>
+                    <value>error</value>
+                  </property>
+                  <property>
+                    <key>SonarApiUrl</key>
+                    <value>http://sonarqube:9000/api</value>
+                  </property>
+                  <property>
+                    <key>StageName</key>
+                    <value />
+                  </property>
+                  <property>
+                    <key>JobCounter</key>
+                    <value />
+                  </property>
+                  <property>
+                    <key>JobName</key>
+                    <value />
+                  </property>
+                </configuration>
+                <runif status="passed" />
+              </task>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="Build_and_push_image">
+        <environmentvariables>
+          <variable name="DOCKERHUB_USERNAME">
+            <value>yassinesnoussi</value>
+          </variable>
+        </environmentvariables>
+        <jobs>
+          <job name="build_push_image">
+            <tasks>
+              <exec command="bash">
+                <arg>-c</arg>
+                <arg>whoami &amp;&amp; docker build -t $DOCKERHUB_USERNAME/sonar_hello_world:$GO_PIPELINE_LABEL .</arg>
+                <runif status="passed" />
+              </exec>
+            </tasks>
+            <artifacts>
+              <artifact type="external" id="sonar-demo" storeId="dockerhub">
+                <configuration>
+                  <property>
+                    <key>BuildFile</key>
+                    <value />
+                  </property>
+                  <property>
+                    <key>Image</key>
+                    <value>${DOCKERHUB_USERNAME}/sonar_hello_world</value>
+                  </property>
+                  <property>
+                    <key>Tag</key>
+                    <value>${GO_PIPELINE_LABEL}</value>
+                  </property>
+                </configuration>
+              </artifact>
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </pipelines>
+  <pipelines group="yaml-example" />
+  <pipelines group="simple" />
+  <environments>
+    <environment name="example" />
+  </environments>
+  <agents>
+    <agent hostname="2425a9cfc7e4" ipaddress="172.21.0.4" uuid="10e2198c-cf0e-4192-8097-7c0e5c3b274a" />
+    <agent hostname="3d8d1a5e8c1d" ipaddress="172.23.0.4" uuid="2a31c414-d0e8-4714-b3fc-59ac84cf96cb" />
+  </agents>
+</cruise>

@@ -1,0 +1,46 @@
+version: "2"
+volumes:
+  var_lib_go-server_addons:
+  var_log_go-server:
+  etc_go:
+  go-addons:
+  var_go:
+  sonarqube_conf:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_bundled-plugins:
+  hostpath:
+    external: true 
+services:
+  gocd-server:
+    image: gocd/gocd-server:v18.9.0
+    ports:
+      - '8585:8153'
+      - '8154:8154'
+    volumes:
+      - var_lib_go-server_addons:/var/lib/go-server/addons
+      - var_log_go-server:/var/log/go-server
+      - etc_go:/etc/go
+      - go-addons:/go-addons
+      - var_go:/var/go
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./cruise-config.xml:/godata/config/cruise-config.xml
+      - ./go_working_dir_plugins_external:/godata/plugins/external
+  gocd-agent-ubuntu:
+    build: ./docker-gocd-agent-ubuntu-16.04
+    image: dasnouz/gocd-agent-node-ubuntu1604
+    environment:
+      - GO_SERVER_URL=https://gocd-server:8154/go
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    links:
+      - gocd-server
+  sonarqube:
+    image: sonarqube:latest
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonarqube_conf:/opt/sonarqube/conf
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_bundled-plugins:/opt/sonarqube/lib/bundled-plugins
