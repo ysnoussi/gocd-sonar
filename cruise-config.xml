@@ -105,13 +105,8 @@
       </stage>
     </pipeline>
   </pipelines>
-  <pipelines group="yaml-example" />
   <pipelines group="simple" />
   <environments>
     <environment name="example" />
   </environments>
-  <agents>
-    <agent hostname="2425a9cfc7e4" ipaddress="172.21.0.4" uuid="10e2198c-cf0e-4192-8097-7c0e5c3b274a" />
-    <agent hostname="3d8d1a5e8c1d" ipaddress="172.23.0.4" uuid="2a31c414-d0e8-4714-b3fc-59ac84cf96cb" />
-  </agents>
 </cruise>
